@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_error_network">Отсутствует подключение к сети</string>>
+    <string name="auth_error_invalid_phone_number">Введите корректный телефон</string>
+    <string name="auth_error_failure_authorization">Не удалось авторизоваться</string>
+    <string name="auth_error_wrong_sms_code">Неверный код из СМС</string>
+    <string name="auth_error_phone_is_null">Введите номер телефона</string>
+    <string name="auth_error_too_many_requests">Слишком много попыток, попробуйте позже</string>
+    <string name="auth_error_user_exists">Пользователь уже существует</string>
+</resources>
