@@ -93,19 +93,31 @@ class PhoneAuthProvider(private val fragment: Fragment) : AuthProvider {
     }
 
     override fun login(params: Map<String, Any>) {
-        val phone = params[PHONE] as String?
-        val forceResending = phone == phoneNumber
-        phoneNumber = phone
-        username = params[USERNAME] as String?
+        when {
+            params.containsKey(PHONE) -> {
+                val phone = params[PHONE] as String?
+                val forceResending = phone == phoneNumber
+                phoneNumber = phone
+                username = params[USERNAME] as String?
 
-        if (!forceResending) {
-            logout()
-            forceResendingToken = null
-        }
+                if (!forceResending) {
+                    logout()
+                    forceResendingToken = null
+                }
 
-        fragment.lifecycleScope.launch(exceptionHandler) {
-            smsListener = params[RECEIVE_SMS_CALLBACK] as OnSendSmsListener?
-            loginWithPhone()
+                fragment.lifecycleScope.launch(exceptionHandler) {
+                    smsListener = params[RECEIVE_SMS_CALLBACK] as OnSendSmsListener?
+                    loginWithPhone()
+                }
+            }
+            params.containsKey(SMS_CODE) -> {
+                val smsCode = params[SMS_CODE] as String
+                val verificationId = verificationId ?: return
+                val credential = PhoneAuthProvider.getCredential(verificationId, smsCode)
+                fragment.lifecycleScope.launch(credentialAuthHandler) {
+                    proceedWithCredential(credential)
+                }
+            }
         }
     }
 

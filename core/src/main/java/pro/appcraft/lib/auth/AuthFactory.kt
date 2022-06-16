@@ -2,6 +2,8 @@ package pro.appcraft.lib.auth
 
 import androidx.activity.result.ActivityResult
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.merge
 
 class AuthFactory(val fragment: Fragment) {
     private val providers: MutableMap<String, AuthProvider> = mutableMapOf()
@@ -10,11 +12,14 @@ class AuthFactory(val fragment: Fragment) {
      * Register a provider in the providers map
      * This is an internal method; do not call it directly
      */
-    fun register(provider: Pair<String, () -> AuthProvider>): AuthProvider {
+    fun <T : AuthProvider> register(provider: Pair<String, () -> T>): AuthProvider {
         if (!providers.containsKey(provider.first)) {
-            providers += provider.first to provider.second()
+            providers.plusAssign(provider.first to provider.second())
         }
-        return providers.getValue(provider.first)
+        return providers
+            .filterKeys { it == provider.first }
+            .values
+            .first()
     }
 
     fun init() = providers
@@ -25,6 +30,8 @@ class AuthFactory(val fragment: Fragment) {
         .values
         .forEach(AuthProvider::destroy)
         .also { providers.clear() }
+
+    fun authFlow(): Flow<AuthResult> = providers.values.map { it.authFlow }.merge()
 
     fun onActivityResult(activityResult: ActivityResult): Boolean = providers.values
         .map { it.onActivityResult(activityResult) }

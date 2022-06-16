@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    implementation project(':core')
+    api project(':core')
 
     implementation platform("com.google.firebase:firebase-bom:$firebaseBomVersion")
     implementation 'com.google.firebase:firebase-auth-ktx'

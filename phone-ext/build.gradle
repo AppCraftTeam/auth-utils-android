@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    implementation project(':core')
+    api project(':core')
 
     implementation 'com.github.AppCraftTeam.asynceither-utils-android:asynceither:1.1.0'
 }
