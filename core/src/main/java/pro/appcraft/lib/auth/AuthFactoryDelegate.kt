@@ -18,7 +18,7 @@ private class AuthFactoryDelegate : ReadOnlyProperty<Fragment, AuthFactory> {
         if (!::authFactory.isInitialized) {
             authFactory = AuthFactory(thisRef)
         }
-        
+
         if (observer == null) {
             observer = LifecycleEventObserver { _, event ->
                 when (event) {

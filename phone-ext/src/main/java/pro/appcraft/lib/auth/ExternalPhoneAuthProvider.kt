@@ -5,10 +5,12 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import pro.appcraft.either.AsyncCatching
+import pro.appcraft.either.getOrElse
 import pro.appcraft.either.getOrHandle
 
 private const val PROVIDER_PHONE_EXT = "ExternalPhoneProvider"
 private typealias Authenticator = suspend (String) -> AsyncCatching<String>
+private typealias Confirmator = suspend (Pair<String, String>) -> AsyncCatching<String>
 
 val AuthFactory.phoneExternal
     get() = register(PROVIDER_PHONE_EXT to { ExternalPhoneAuthProvider(fragment) })
@@ -19,11 +21,12 @@ class ExternalPhoneAuthProvider(private val fragment: Fragment) : AuthProvider {
     override val authFlow = MutableSharedFlow<AuthResult>(extraBufferCapacity = 1)
 
     private var authenticator: Authenticator? = null
-    private var confirmator: Authenticator? = null
+    private var confirmator: Confirmator? = null
     private var smsSentCallback: OnSendSmsCallback? = null
 
     private lateinit var phone: String
     private lateinit var code: String
+    private var authKey: String? = null
 
     override fun login(params: Map<String, Any>) {
         when {
@@ -47,18 +50,18 @@ class ExternalPhoneAuthProvider(private val fragment: Fragment) : AuthProvider {
         authenticator = method
     }
 
-    fun setExternalConfirmation(method: Authenticator) {
+    fun setExternalConfirmation(method: Confirmator) {
         confirmator = method
     }
 
     private suspend fun sendCode(phone: String) {
         requireNotNull(authenticator)
-        authenticator?.invoke(phone)?.fold({}, {})
+        authKey = authenticator?.invoke(phone)?.orNull()
     }
 
     private suspend fun confirmCode(code: String) {
         requireNotNull(confirmator)
-        confirmator?.invoke(code)
+        confirmator?.invoke(authKey.orEmpty() to code)
             ?.map { AuthResult.Success(token = it, "") }
             ?.getOrHandle { AuthResult.Error(it.message.orEmpty(), it) }
             ?.also { authFlow.emit(it) }
