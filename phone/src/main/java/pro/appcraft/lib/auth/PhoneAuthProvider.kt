@@ -88,21 +88,23 @@ class PhoneAuthProvider(private val fragment: Fragment) : AuthProvider {
         }
     }
 
-    override fun init(params: Map<String, Any>) {
-        smsListener = params[RECEIVE_SMS_CALLBACK] as OnSendSmsListener?
+    override fun init(vararg params: Pair<String, Any>) {
+        val paramsMap = params.toMap()
+        smsListener = paramsMap[RECEIVE_SMS_CALLBACK] as OnSendSmsListener?
     }
 
     override fun setActivityLauncher(launcher:ActivityResultLauncher<Intent>?) {
         activityLauncher = launcher
     }
 
-    override fun login(params: Map<String, Any>) {
+    override fun login(vararg params: Pair<String, Any>) {
+        val paramsMap = params.toMap()
         when {
-            params.containsKey(PHONE) -> {
-                val phone = params[PHONE] as String?
+            paramsMap.containsKey(PHONE) -> {
+                val phone = paramsMap[PHONE] as String?
                 val forceResending = phone == phoneNumber
                 phoneNumber = phone
-                username = params[USERNAME] as String?
+                username = paramsMap[USERNAME] as String?
 
                 if (!forceResending) {
                     logout()
@@ -113,8 +115,8 @@ class PhoneAuthProvider(private val fragment: Fragment) : AuthProvider {
                     loginWithPhone()
                 }
             }
-            params.containsKey(SMS_CODE) -> {
-                val smsCode = params[SMS_CODE] as String
+            paramsMap.containsKey(SMS_CODE) -> {
+                val smsCode = paramsMap[SMS_CODE] as String
                 val verificationId = verificationId ?: return
                 val credential = PhoneAuthProvider.getCredential(verificationId, smsCode)
                 fragment.lifecycleScope.launch(credentialAuthHandler) {

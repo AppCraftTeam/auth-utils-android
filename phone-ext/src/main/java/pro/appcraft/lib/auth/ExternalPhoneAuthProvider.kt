@@ -27,24 +27,25 @@ class ExternalPhoneAuthProvider(private val fragment: Fragment) : AuthProvider {
     private lateinit var code: String
     private var authKey: String? = null
 
-    override fun init(params: Map<String, Any>) {
-        super.init(params)
-        // todo: do something with the unchecked casts
-        (params[AUTHENTICATOR_CALLBACK] as Authenticator?)?.let(::setExternalAuthentication)
-        (params[CONFIRMATOR_CALLBACK] as Confirmator?)?.let(::setExternalConfirmation)
-        smsSentCallback = params[RECEIVE_SMS_CALLBACK] as OnSendSmsCallback?
+    override fun init(vararg params: Pair<String, Any>) {
+        val paramsMap = params.toMap()
+        // todo: do something with the unchecked casts\
+        (paramsMap[AUTHENTICATOR_CALLBACK] as Authenticator?)?.let(::setExternalAuthentication)
+        (paramsMap[CONFIRMATOR_CALLBACK] as Confirmator?)?.let(::setExternalConfirmation)
+        smsSentCallback = paramsMap[RECEIVE_SMS_CALLBACK] as OnSendSmsCallback?
     }
 
-    override fun login(params: Map<String, Any>) {
+    override fun login(vararg params: Pair<String, Any>) {
+        val paramsMap = params.toMap()
         when {
-            params.containsKey(PHONE) -> {
-                phone = params.getValue(PHONE) as String
+            paramsMap.containsKey(PHONE) -> {
+                phone = paramsMap.getValue(PHONE) as String
                 fragment.lifecycleScope.launch {
                     sendCode(phone)
                 }
             }
-            params.containsKey(SMS_CODE) -> {
-                code = params.getValue(SMS_CODE) as String
+            paramsMap.containsKey(SMS_CODE) -> {
+                code = paramsMap.getValue(SMS_CODE) as String
                 fragment.lifecycleScope.launch {
                     confirmCode(code)
                 }

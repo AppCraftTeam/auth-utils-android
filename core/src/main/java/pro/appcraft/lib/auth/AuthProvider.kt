@@ -11,9 +11,9 @@ interface AuthProvider {
 
     val authFlow: SharedFlow<AuthResult>
 
-    fun init(params: Map<String, Any> = emptyMap()) {}
+    fun init(vararg params: Pair<String, Any> = emptyArray()) {}
 
-    fun login(params: Map<String, Any> = emptyMap())
+    fun login(vararg params: Pair<String, Any> = emptyArray())
 
     fun setActivityLauncher(launcher: ActivityResultLauncher<Intent>?) {}
 
