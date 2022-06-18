@@ -11,7 +11,7 @@ interface AuthProvider {
 
     val authFlow: SharedFlow<AuthResult>
 
-    fun init() {}
+    fun init(params: Map<String, Any> = emptyMap()) {}
 
     fun login(params: Map<String, Any> = emptyMap())
 

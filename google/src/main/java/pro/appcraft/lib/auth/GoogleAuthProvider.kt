@@ -47,8 +47,8 @@ class GoogleAuthProvider(private val fragment: Fragment) : AuthProvider {
         }
     }
 
-    override fun init() {
-        super.init()
+    override fun init(params: Map<String, Any>) {
+        super.init(params)
         signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(fragment.getString(R.string.auth_google_client_id))
             .requestEmail()

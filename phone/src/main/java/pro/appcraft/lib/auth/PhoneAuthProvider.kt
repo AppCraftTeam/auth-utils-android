@@ -88,6 +88,10 @@ class PhoneAuthProvider(private val fragment: Fragment) : AuthProvider {
         }
     }
 
+    override fun init(params: Map<String, Any>) {
+        smsListener = params[RECEIVE_SMS_CALLBACK] as OnSendSmsListener?
+    }
+
     override fun setActivityLauncher(launcher:ActivityResultLauncher<Intent>?) {
         activityLauncher = launcher
     }
@@ -106,7 +110,6 @@ class PhoneAuthProvider(private val fragment: Fragment) : AuthProvider {
                 }
 
                 fragment.lifecycleScope.launch(exceptionHandler) {
-                    smsListener = params[RECEIVE_SMS_CALLBACK] as OnSendSmsListener?
                     loginWithPhone()
                 }
             }
